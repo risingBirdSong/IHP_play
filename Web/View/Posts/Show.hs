@@ -1,7 +1,7 @@
 module Web.View.Posts.Show where
 import Web.View.Prelude
 
-data ShowView = ShowView { post :: Post }
+data ShowView = ShowView { post :: Include "comments" Post }
 
 instance View ShowView where
     html ShowView { .. } = [hsx|
@@ -12,5 +12,14 @@ instance View ShowView where
             </ol>
         </nav>
         <h1>{get #title post}</h1>
+        <p>{get #createdAt post |> timeAgo}</p>
         <p>{get #body post}</p>
+        <a href={NewCommentAction (get #id post)}> Add Comment </a>
+        <p></p>
+        <div>{forEach (get #comments post) renderComment }</div>
     |]
+
+renderComment comment = [hsx| <div class="mt-4">
+            <h5>{get #author comment}</h5>
+            <p>{get #body comment}</p>
+        </div> |]
